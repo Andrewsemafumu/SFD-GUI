@@ -31,7 +31,6 @@ public class FileSelectorForm extends javax.swing.JFrame {
 
         buttonGroup1 = new javax.swing.ButtonGroup();
         jLabel1 = new javax.swing.JLabel();
-        jLabel2 = new javax.swing.JLabel();
         jLabel3 = new javax.swing.JLabel();
         txtID = new javax.swing.JTextField();
         rbDownload = new javax.swing.JRadioButton();
@@ -40,27 +39,46 @@ public class FileSelectorForm extends javax.swing.JFrame {
         btnEnter = new javax.swing.JButton();
         jScrollPane1 = new javax.swing.JScrollPane();
         txtDataDisplay = new javax.swing.JTextArea();
+        backgroundfileselectorLbl = new javax.swing.JLabel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
+        getContentPane().setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
 
-        jLabel1.setForeground(new java.awt.Color(255, 51, 102));
-        jLabel1.setText("File Selector Form ");
+        jLabel1.setFont(new java.awt.Font("Helvetica Neue", 1, 24)); // NOI18N
+        jLabel1.setForeground(new java.awt.Color(255, 255, 255));
+        jLabel1.setText("FILE SELECTOR FORM ");
+        getContentPane().add(jLabel1, new org.netbeans.lib.awtextra.AbsoluteConstraints(180, 40, 275, -1));
 
-        jLabel3.setForeground(new java.awt.Color(255, 51, 102));
+        jLabel3.setFont(new java.awt.Font("Helvetica Neue", 1, 18)); // NOI18N
+        jLabel3.setForeground(new java.awt.Color(255, 255, 255));
         jLabel3.setText("ID ");
+        getContentPane().add(jLabel3, new org.netbeans.lib.awtextra.AbsoluteConstraints(50, 100, 36, -1));
 
         txtID.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 txtIDActionPerformed(evt);
             }
         });
+        getContentPane().add(txtID, new org.netbeans.lib.awtextra.AbsoluteConstraints(90, 90, 280, 40));
 
-        rbDownload.setForeground(new java.awt.Color(255, 51, 51));
+        buttonGroup1.add(rbDownload);
+        rbDownload.setFont(new java.awt.Font("Helvetica Neue", 1, 18)); // NOI18N
+        rbDownload.setForeground(new java.awt.Color(255, 255, 255));
         rbDownload.setText("Download File");
+        rbDownload.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                rbDownloadActionPerformed(evt);
+            }
+        });
+        getContentPane().add(rbDownload, new org.netbeans.lib.awtextra.AbsoluteConstraints(90, 150, 240, -1));
 
-        rbOpen.setForeground(new java.awt.Color(255, 51, 51));
+        buttonGroup1.add(rbOpen);
+        rbOpen.setFont(new java.awt.Font("Helvetica Neue", 1, 18)); // NOI18N
+        rbOpen.setForeground(new java.awt.Color(255, 255, 255));
         rbOpen.setText("Open Folder ");
+        getContentPane().add(rbOpen, new org.netbeans.lib.awtextra.AbsoluteConstraints(90, 180, 240, -1));
 
+        btnUploadFolder.setFont(new java.awt.Font("Helvetica Neue", 1, 18)); // NOI18N
         btnUploadFolder.setForeground(new java.awt.Color(255, 51, 102));
         btnUploadFolder.setText("Upload");
         btnUploadFolder.addActionListener(new java.awt.event.ActionListener() {
@@ -68,7 +86,9 @@ public class FileSelectorForm extends javax.swing.JFrame {
                 btnUploadFolderActionPerformed(evt);
             }
         });
+        getContentPane().add(btnUploadFolder, new org.netbeans.lib.awtextra.AbsoluteConstraints(350, 380, 200, 50));
 
+        btnEnter.setFont(new java.awt.Font("Helvetica Neue", 1, 18)); // NOI18N
         btnEnter.setForeground(new java.awt.Color(255, 51, 102));
         btnEnter.setText("Enter");
         btnEnter.addActionListener(new java.awt.event.ActionListener() {
@@ -76,74 +96,16 @@ public class FileSelectorForm extends javax.swing.JFrame {
                 btnEnterActionPerformed(evt);
             }
         });
+        getContentPane().add(btnEnter, new org.netbeans.lib.awtextra.AbsoluteConstraints(50, 380, 200, 50));
 
         txtDataDisplay.setColumns(20);
         txtDataDisplay.setRows(5);
         jScrollPane1.setViewportView(txtDataDisplay);
 
-        javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
-        getContentPane().setLayout(layout);
-        layout.setHorizontalGroup(
-            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(layout.createSequentialGroup()
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                        .addGap(0, 0, Short.MAX_VALUE)
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(rbOpen, javax.swing.GroupLayout.PREFERRED_SIZE, 98, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(rbDownload, javax.swing.GroupLayout.PREFERRED_SIZE, 110, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                    .addGroup(layout.createSequentialGroup()
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addGroup(layout.createSequentialGroup()
-                                .addGap(99, 99, 99)
-                                .addComponent(jLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, 139, javax.swing.GroupLayout.PREFERRED_SIZE))
-                            .addGroup(layout.createSequentialGroup()
-                                .addContainerGap()
-                                .addComponent(jLabel2, javax.swing.GroupLayout.PREFERRED_SIZE, 86, javax.swing.GroupLayout.PREFERRED_SIZE))
-                            .addGroup(layout.createSequentialGroup()
-                                .addComponent(jLabel3, javax.swing.GroupLayout.PREFERRED_SIZE, 36, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addGap(51, 51, 51)
-                                .addComponent(txtID, javax.swing.GroupLayout.PREFERRED_SIZE, 165, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                        .addGap(0, 0, Short.MAX_VALUE))
-                    .addGroup(layout.createSequentialGroup()
-                        .addContainerGap()
-                        .addComponent(btnEnter)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 24, Short.MAX_VALUE)
-                        .addComponent(btnUploadFolder)))
-                .addContainerGap())
-        );
-        layout.setVerticalGroup(
-            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(layout.createSequentialGroup()
-                .addGap(16, 16, 16)
-                .addComponent(jLabel1)
-                .addGap(15, 15, 15)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jLabel3)
-                    .addComponent(txtID, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jLabel2)
-                .addGap(26, 26, 26)
-                .addComponent(rbDownload)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addComponent(rbOpen)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(layout.createSequentialGroup()
-                        .addGap(41, 41, 41)
-                        .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 101, Short.MAX_VALUE)
-                        .addContainerGap())
-                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                                .addComponent(btnEnter)
-                                .addGap(33, 33, 33))
-                            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                                .addComponent(btnUploadFolder)
-                                .addGap(32, 32, 32))))))
-        );
+        getContentPane().add(jScrollPane1, new org.netbeans.lib.awtextra.AbsoluteConstraints(50, 230, 500, 130));
+
+        backgroundfileselectorLbl.setIcon(new javax.swing.ImageIcon(getClass().getResource("/backgroundhome.png"))); // NOI18N
+        getContentPane().add(backgroundfileselectorLbl, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, -1, -1));
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
@@ -168,6 +130,10 @@ public class FileSelectorForm extends javax.swing.JFrame {
         txtDataDisplay.setText("Fetching data for ID: " + txtID.getText() + "\nAction: " + action);
     }
     }//GEN-LAST:event_btnEnterActionPerformed
+
+    private void rbDownloadActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_rbDownloadActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_rbDownloadActionPerformed
 
     /**
      * @param args the command line arguments
@@ -195,11 +161,11 @@ public class FileSelectorForm extends javax.swing.JFrame {
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JLabel backgroundfileselectorLbl;
     private javax.swing.JButton btnEnter;
     private javax.swing.JButton btnUploadFolder;
     private javax.swing.ButtonGroup buttonGroup1;
     private javax.swing.JLabel jLabel1;
-    private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JRadioButton rbDownload;

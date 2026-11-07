@@ -36,19 +36,31 @@ public class HomeForm extends javax.swing.JFrame {
         txtPassword = new javax.swing.JTextField();
         btnLogIn = new javax.swing.JButton();
         btnSignUp = new javax.swing.JButton();
+        backgroundhomeLbl = new javax.swing.JLabel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setBackground(new java.awt.Color(102, 102, 255));
+        setPreferredSize(new java.awt.Dimension(600, 450));
+        getContentPane().setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
 
-        lblTitle.setForeground(new java.awt.Color(255, 51, 102));
-        lblTitle.setText("      HOME PAGE ");
+        lblTitle.setFont(new java.awt.Font("Helvetica Neue", 1, 24)); // NOI18N
+        lblTitle.setForeground(new java.awt.Color(255, 255, 255));
+        lblTitle.setText("HOME PAGE");
+        getContentPane().add(lblTitle, new org.netbeans.lib.awtextra.AbsoluteConstraints(220, 40, 150, 30));
 
-        emailLb.setForeground(new java.awt.Color(255, 51, 102));
+        emailLb.setFont(new java.awt.Font("Helvetica Neue", 1, 18)); // NOI18N
+        emailLb.setForeground(new java.awt.Color(255, 255, 255));
         emailLb.setText("Email");
+        getContentPane().add(emailLb, new org.netbeans.lib.awtextra.AbsoluteConstraints(70, 140, 81, -1));
 
-        passwordLb.setForeground(new java.awt.Color(255, 51, 102));
+        passwordLb.setFont(new java.awt.Font("Helvetica Neue", 1, 18)); // NOI18N
+        passwordLb.setForeground(new java.awt.Color(255, 255, 255));
         passwordLb.setText("Password");
+        getContentPane().add(passwordLb, new org.netbeans.lib.awtextra.AbsoluteConstraints(70, 220, -1, -1));
+        getContentPane().add(txtEmail, new org.netbeans.lib.awtextra.AbsoluteConstraints(170, 130, 280, 40));
+        getContentPane().add(txtPassword, new org.netbeans.lib.awtextra.AbsoluteConstraints(170, 210, 280, 40));
 
+        btnLogIn.setFont(new java.awt.Font("Helvetica Neue", 1, 18)); // NOI18N
         btnLogIn.setForeground(new java.awt.Color(255, 51, 102));
         btnLogIn.setText("Login");
         btnLogIn.addActionListener(new java.awt.event.ActionListener() {
@@ -56,7 +68,9 @@ public class HomeForm extends javax.swing.JFrame {
                 btnLogInActionPerformed(evt);
             }
         });
+        getContentPane().add(btnLogIn, new org.netbeans.lib.awtextra.AbsoluteConstraints(40, 320, 200, 50));
 
+        btnSignUp.setFont(new java.awt.Font("Helvetica Neue", 1, 18)); // NOI18N
         btnSignUp.setForeground(new java.awt.Color(255, 51, 102));
         btnSignUp.setText("Sign Up");
         btnSignUp.addActionListener(new java.awt.event.ActionListener() {
@@ -64,52 +78,10 @@ public class HomeForm extends javax.swing.JFrame {
                 btnSignUpActionPerformed(evt);
             }
         });
+        getContentPane().add(btnSignUp, new org.netbeans.lib.awtextra.AbsoluteConstraints(370, 320, 200, 50));
 
-        javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
-        getContentPane().setLayout(layout);
-        layout.setHorizontalGroup(
-            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(layout.createSequentialGroup()
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(layout.createSequentialGroup()
-                        .addGap(122, 122, 122)
-                        .addComponent(lblTitle, javax.swing.GroupLayout.PREFERRED_SIZE, 127, javax.swing.GroupLayout.PREFERRED_SIZE))
-                    .addGroup(layout.createSequentialGroup()
-                        .addContainerGap()
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                            .addGroup(layout.createSequentialGroup()
-                                .addComponent(btnLogIn, javax.swing.GroupLayout.PREFERRED_SIZE, 67, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addGap(135, 135, 135)
-                                .addComponent(btnSignUp))
-                            .addGroup(layout.createSequentialGroup()
-                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                    .addComponent(emailLb, javax.swing.GroupLayout.PREFERRED_SIZE, 81, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                    .addComponent(passwordLb))
-                                .addGap(76, 76, 76)
-                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                                    .addComponent(txtEmail)
-                                    .addComponent(txtPassword, javax.swing.GroupLayout.DEFAULT_SIZE, 120, Short.MAX_VALUE))))))
-                .addContainerGap(37, Short.MAX_VALUE))
-        );
-        layout.setVerticalGroup(
-            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(layout.createSequentialGroup()
-                .addContainerGap()
-                .addComponent(lblTitle, javax.swing.GroupLayout.PREFERRED_SIZE, 34, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(24, 24, 24)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(emailLb)
-                    .addComponent(txtEmail, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addGap(29, 29, 29)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(passwordLb)
-                    .addComponent(txtPassword, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addGap(67, 67, 67)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(btnLogIn)
-                    .addComponent(btnSignUp))
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-        );
+        backgroundhomeLbl.setIcon(new javax.swing.ImageIcon(getClass().getResource("/backgroundhome.png"))); // NOI18N
+        getContentPane().add(backgroundhomeLbl, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, -1, -1));
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
@@ -162,6 +134,7 @@ public class HomeForm extends javax.swing.JFrame {
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JLabel backgroundhomeLbl;
     private javax.swing.JButton btnLogIn;
     private javax.swing.JButton btnSignUp;
     private javax.swing.JLabel emailLb;

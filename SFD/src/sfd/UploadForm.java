@@ -35,67 +35,44 @@ public class UploadForm extends javax.swing.JFrame {
         txtFileName = new javax.swing.JTextField();
         btnSelectFile = new javax.swing.JButton();
         btnUpload = new javax.swing.JButton();
+        backgroundLbl = new javax.swing.JLabel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
+        getContentPane().setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
 
-        jLabel1.setForeground(new java.awt.Color(255, 51, 51));
-        jLabel1.setText("Upload Form ");
+        jLabel1.setFont(new java.awt.Font("Helvetica Neue", 1, 24)); // NOI18N
+        jLabel1.setForeground(new java.awt.Color(255, 255, 255));
+        jLabel1.setText("UPLOAD FORM ");
+        getContentPane().add(jLabel1, new org.netbeans.lib.awtextra.AbsoluteConstraints(220, 40, 190, -1));
 
-        jLabel2.setForeground(new java.awt.Color(255, 51, 51));
+        jLabel2.setFont(new java.awt.Font("Helvetica Neue", 1, 18)); // NOI18N
+        jLabel2.setForeground(new java.awt.Color(255, 255, 255));
         jLabel2.setText("File Name ");
+        getContentPane().add(jLabel2, new org.netbeans.lib.awtextra.AbsoluteConstraints(90, 180, -1, -1));
+        getContentPane().add(txtFileName, new org.netbeans.lib.awtextra.AbsoluteConstraints(190, 170, 280, 40));
 
+        btnSelectFile.setFont(new java.awt.Font("Helvetica Neue", 1, 18)); // NOI18N
         btnSelectFile.setForeground(new java.awt.Color(255, 51, 51));
-        btnSelectFile.setText("select file ");
+        btnSelectFile.setText("Select File ");
         btnSelectFile.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 btnSelectFileActionPerformed(evt);
             }
         });
+        getContentPane().add(btnSelectFile, new org.netbeans.lib.awtextra.AbsoluteConstraints(50, 300, 200, 50));
 
+        btnUpload.setFont(new java.awt.Font("Helvetica Neue", 1, 18)); // NOI18N
         btnUpload.setForeground(new java.awt.Color(255, 51, 51));
-        btnUpload.setText("upload ");
+        btnUpload.setText("Upload ");
         btnUpload.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 btnUploadActionPerformed(evt);
             }
         });
+        getContentPane().add(btnUpload, new org.netbeans.lib.awtextra.AbsoluteConstraints(320, 300, 200, 50));
 
-        javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
-        getContentPane().setLayout(layout);
-        layout.setHorizontalGroup(
-            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(layout.createSequentialGroup()
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(layout.createSequentialGroup()
-                        .addGap(97, 97, 97)
-                        .addComponent(jLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, 169, javax.swing.GroupLayout.PREFERRED_SIZE))
-                    .addGroup(layout.createSequentialGroup()
-                        .addContainerGap()
-                        .addComponent(jLabel2)
-                        .addGap(70, 70, 70)
-                        .addComponent(txtFileName, javax.swing.GroupLayout.PREFERRED_SIZE, 125, javax.swing.GroupLayout.PREFERRED_SIZE))
-                    .addGroup(layout.createSequentialGroup()
-                        .addContainerGap()
-                        .addComponent(btnSelectFile)
-                        .addGap(73, 73, 73)
-                        .addComponent(btnUpload)))
-                .addContainerGap(134, Short.MAX_VALUE))
-        );
-        layout.setVerticalGroup(
-            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(layout.createSequentialGroup()
-                .addContainerGap()
-                .addComponent(jLabel1)
-                .addGap(27, 27, 27)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jLabel2)
-                    .addComponent(txtFileName, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 155, Short.MAX_VALUE)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(btnSelectFile)
-                    .addComponent(btnUpload))
-                .addGap(51, 51, 51))
-        );
+        backgroundLbl.setIcon(new javax.swing.ImageIcon(getClass().getResource("/backgroundhome.png"))); // NOI18N
+        getContentPane().add(backgroundLbl, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, -1, -1));
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
@@ -144,6 +121,7 @@ public class UploadForm extends javax.swing.JFrame {
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JLabel backgroundLbl;
     private javax.swing.JButton btnSelectFile;
     private javax.swing.JButton btnUpload;
     private javax.swing.JLabel jLabel1;
