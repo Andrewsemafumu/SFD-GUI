@@ -15,6 +15,7 @@ import javax.crypto.BadPaddingException;
 import javax.crypto.Cipher;
 import javax.crypto.IllegalBlockSizeException;
 import javax.crypto.NoSuchPaddingException;
+import javax.crypto.SecretKey;
 
 /**
  *
@@ -23,14 +24,11 @@ import javax.crypto.NoSuchPaddingException;
 public class RsaManagement {
     
     // Encrypt AES Key with user's RSA Public Key
-    // May change method later - current implementation presumes I encode AES Key with Base64, I however will probably not
-    // It is just a placeholder as I have yet to implement AES Key Generation and Encryption/Dencryption
-    public String encryptAesKeyWithRsaPublicKey(String aesKey, String rsaPublicKey) {
+    public String encryptAesKeyWithRsaPublicKey(SecretKey aesKey, String rsaPublicKey) {
         String encodedEncryptedAesKey = null;
         
         try {
-            // Decode keys that are encoded with Base64
-            byte[] aesKeyDecoded = Base64.getDecoder().decode(aesKey);
+            // Decode key that are encoded with Base64
             byte[] rsaPublicKeyDecoded = Base64.getDecoder().decode(rsaPublicKey);
             
             // Convert public key bytes into PublicKey Object
@@ -41,11 +39,13 @@ public class RsaManagement {
             // Encrypt AES Key with RSA public Key
             Cipher encryptCipher = Cipher.getInstance("RSA");
             encryptCipher.init(Cipher.ENCRYPT_MODE, publicKey);
-        
-            byte[] encryptedAesKey = encryptCipher.doFinal(aesKeyDecoded);
+            
+            // Convert AES Key into raw bytes and encrypt the key with RSA public key
+            byte[] encryptedAesKey = encryptCipher.doFinal(aesKey.getEncoded());
         
             // Encode encryptedAesKey with Base64 to convert it to string object
             encodedEncryptedAesKey = Base64.getEncoder().encodeToString(encryptedAesKey);
+            
         } catch(NoSuchAlgorithmException e) {
             e.printStackTrace();
         } catch(NoSuchPaddingException e) {
@@ -61,6 +61,11 @@ public class RsaManagement {
         }
         
         return encodedEncryptedAesKey;
+    }
+    
+    
+    Public SecretKey dencryptAesKeyWithRsaPrivateKey() {
+
     }
     
 }
