@@ -4,6 +4,8 @@
  */
 package sfd;
 
+import sfd.Person;
+
 /**
  *
  * @author HP

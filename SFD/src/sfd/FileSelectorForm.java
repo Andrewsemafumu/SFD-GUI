@@ -4,11 +4,16 @@
  */
 package sfd;
 
+import sfd.api.ApiClient;
+import javax.swing.SwingWorker;
+import java.net.http.HttpResponse;
+
 /**
  *
  * @author HP
  */
 import javax.swing.JOptionPane;
+import sfd.UploadForm;
 public class FileSelectorForm extends javax.swing.JFrame {
     
     private static final java.util.logging.Logger logger = java.util.logging.Logger.getLogger(FileSelectorForm.class.getName());
@@ -19,6 +24,15 @@ public class FileSelectorForm extends javax.swing.JFrame {
     public FileSelectorForm() {
         initComponents();
     }
+        
+    private int userId;
+    private int currentFolderId = -1;
+
+    public FileSelectorForm(int userId) {
+        this();
+        this.userId = userId;
+    }
+
 
     /**
      * This method is called from within the constructor to initialize the form.
@@ -115,20 +129,79 @@ public class FileSelectorForm extends javax.swing.JFrame {
     }//GEN-LAST:event_txtIDActionPerformed
 
     private void btnUploadFolderActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnUploadFolderActionPerformed
-         new UploadForm().setVisible(true);
-    this.dispose();
+        if (currentFolderId == -1) {
+            JOptionPane.showMessageDialog(this,
+                    "Please open your folder first.");
+            return;
+        }
+
+        new UploadForm(userId, currentFolderId).setVisible(true);
+        this.dispose();
     }//GEN-LAST:event_btnUploadFolderActionPerformed
 
     private void btnEnterActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnEnterActionPerformed
-         String action = "";
-    if (rbDownload.isSelected()) action = "Download File";
-    if (rbOpen.isSelected()) action = "Open Folder";
     
-    if (action.isEmpty()) {
-        JOptionPane.showMessageDialog(this, "Please select a radio option first.");
-    } else {
-        txtDataDisplay.setText("Fetching data for ID: " + txtID.getText() + "\nAction: " + action);
-    }
+        if (!rbOpen.isSelected()) {
+            JOptionPane.showMessageDialog(this,
+                    "Please select Open Folder.");
+            return;
+        }
+
+        int folderId;
+
+        try {
+            folderId = Integer.parseInt(txtID.getText().trim());
+
+            if (folderId <= 0) {
+                throw new NumberFormatException();
+            }
+        } catch (NumberFormatException ex) {
+            JOptionPane.showMessageDialog(this,
+                    "Please enter a valid Folder ID.");
+            return;
+        }
+
+        btnEnter.setEnabled(false);
+        txtDataDisplay.setText("Loading folder contents...");
+
+        new SwingWorker<HttpResponse<String>, Void>() {
+
+            @Override
+            protected HttpResponse<String> doInBackground()
+                    throws Exception {
+
+                ApiClient api = new ApiClient();
+
+                return api.getJson(
+                        "/api/requestToViewFolderContents/" + folderId
+                );
+            }
+
+            @Override
+            protected void done() {
+                btnEnter.setEnabled(true);
+
+                try {
+                    HttpResponse<String> response = get();
+
+                    if (response.statusCode() == 200) {
+                        currentFolderId = folderId;
+                        txtDataDisplay.setText(response.body());
+                    } else if (response.statusCode() == 404) {
+                        txtDataDisplay.setText("Folder not found.");
+                    } else {
+                        txtDataDisplay.setText(
+                                "Server returned: " + response.statusCode());
+                    }
+
+                } catch (Exception ex) {
+                    JOptionPane.showMessageDialog(
+                            FileSelectorForm.this,
+                            "Connection failed: " + ex.getMessage()
+                    );
+                }
+            }
+        }.execute();
     }//GEN-LAST:event_btnEnterActionPerformed
 
     private void rbDownloadActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_rbDownloadActionPerformed

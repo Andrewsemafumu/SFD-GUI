@@ -4,14 +4,44 @@
  */
 package sfd;
 
+
+import sfd.api.ApiClient;
+import javax.swing.SwingWorker;
+import java.net.http.HttpResponse;
+
 /**
  *
  * @author HP
  */
 import javax.swing.JOptionPane;
+import sfd.SignUpForm;
 public class HomeForm extends javax.swing.JFrame {
     
     private static final java.util.logging.Logger logger = java.util.logging.Logger.getLogger(HomeForm.class.getName());
+    
+    
+    private static String jsonString(String value) {
+        StringBuilder result = new StringBuilder("\"");
+
+        for (char c : value.toCharArray()) {
+            switch (c) {
+                case '\\' -> result.append("\\\\");
+                case '"' -> result.append("\\\"");
+                case '\n' -> result.append("\\n");
+                case '\r' -> result.append("\\r");
+                case '\t' -> result.append("\\t");
+                default -> {
+                    if (c < 32) {
+                        result.append(String.format("\\u%04x", (int) c));
+                    } else {
+                        result.append(c);
+                    }
+                }
+            }
+        }
+        return result.append('"').toString();
+    }
+
 
     /**
      * Creates new form HomeForm
@@ -40,7 +70,6 @@ public class HomeForm extends javax.swing.JFrame {
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setBackground(new java.awt.Color(102, 102, 255));
-        setPreferredSize(new java.awt.Dimension(600, 450));
         getContentPane().setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
 
         lblTitle.setFont(new java.awt.Font("Helvetica Neue", 1, 24)); // NOI18N
@@ -87,20 +116,73 @@ public class HomeForm extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void btnLogInActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnLogInActionPerformed
-         String email = txtEmail.getText();
-    String pwd = txtPassword.getText();
-    
-    if(email.isEmpty() || pwd.isEmpty()){
-        JOptionPane.showMessageDialog(this, "Please enter email and password.");
-        return;
-    }
-    
-    // In a real app, you would check the database/hash here
-    JOptionPane.showMessageDialog(this, "Login Successful for: " + email);
-    
-    // Send them to the File Selector page
-    new FileSelectorForm().setVisible(true);
-    this.dispose();
+
+        String email = txtEmail.getText().trim();
+        String password = txtPassword.getText();
+
+        if (email.isEmpty() || password.isEmpty()) {
+            JOptionPane.showMessageDialog(this,
+                    "Please enter email and password.");
+            return;
+        }
+
+        String json = "{\"email\":" + jsonString(email)
+                + ",\"password\":" + jsonString(password) + "}";
+
+        btnLogIn.setEnabled(false);
+
+        new SwingWorker<HttpResponse<String>, Void>() {
+            @Override
+            protected HttpResponse<String> doInBackground() throws Exception {
+                ApiClient api = new ApiClient();
+                HttpResponse<String> response =
+                        api.postJson("/api/login", json);
+                return response;
+            }
+
+            @Override
+            protected void done() {
+                btnLogIn.setEnabled(true);
+
+                try {
+                    HttpResponse<String> response = get();
+                    int status = response.statusCode();
+
+                    
+                if (status == 200) {
+                    String body = response.body();
+
+                    java.util.regex.Matcher matcher =
+                            java.util.regex.Pattern
+                                    .compile("\"userId\"\\s*:\\s*(\\d+)")
+                                    .matcher(body);
+
+                    if (matcher.find()) {
+                        int userId = Integer.parseInt(matcher.group(1));
+
+                        JOptionPane.showMessageDialog(HomeForm.this,
+                                "Login successful! User ID: " + userId);
+                        
+                        new FileSelectorForm(userId).setVisible(true);
+                        HomeForm.this.dispose();
+                    } else {
+                        JOptionPane.showMessageDialog(HomeForm.this,
+                                "Could not retrieve User ID.");
+                    }
+                }
+                else if (status == 401) {
+                        JOptionPane.showMessageDialog(HomeForm.this,
+                                "Invalid email or password.");
+                    } else {
+                        JOptionPane.showMessageDialog(HomeForm.this,
+                                "Server returned: " + status);
+                    }
+                } catch (Exception ex) {
+                    JOptionPane.showMessageDialog(HomeForm.this,
+                            "Connection failed: " + ex.getMessage());
+                }
+            }
+        }.execute();
     }//GEN-LAST:event_btnLogInActionPerformed
 
     private void btnSignUpActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSignUpActionPerformed

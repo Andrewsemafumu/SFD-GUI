@@ -11,8 +11,8 @@ package sfd.config;
 public class ServerConnectionConfig {
     private String serverUrl;
     
-    private void serverConnectionConfig() {
-        this.serverUrl = "54.78.153.242:8080";
+    public ServerConnectionConfig() {
+        this.serverUrl = "http://54.78.153.242:8080";
     }
     
     public String getServerUrl() {

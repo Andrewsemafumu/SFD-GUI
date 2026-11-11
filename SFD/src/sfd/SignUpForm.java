@@ -4,6 +4,10 @@
  */
 package sfd;
 
+import sfd.api.ApiClient;
+import javax.swing.SwingWorker;
+import java.net.http.HttpResponse;
+
 /**
  *
  * @author HP
@@ -12,6 +16,28 @@ import javax.swing.JOptionPane;
 public class SignUpForm extends javax.swing.JFrame {
     
     private static final java.util.logging.Logger logger = java.util.logging.Logger.getLogger(SignUpForm.class.getName());
+    
+    private static String jsonString(String value) {
+        StringBuilder result = new StringBuilder("\"");
+
+        for (char c : value.toCharArray()) {
+            switch (c) {
+                case '\\' -> result.append("\\\\");
+                case '"' -> result.append("\\\"");
+                case '\n' -> result.append("\\n");
+                case '\r' -> result.append("\\r");
+                case '\t' -> result.append("\\t");
+                default -> {
+                    if (c < 32) {
+                        result.append(String.format("\\u%04x", (int) c));
+                    } else {
+                        result.append(c);
+                    }
+                }
+            }
+        }
+        return result.append('"').toString();
+    }
 
     /**
      * Creates new form SignUpForm
@@ -110,29 +136,65 @@ public class SignUpForm extends javax.swing.JFrame {
     }//GEN-LAST:event_cmbSectorActionPerformed
 
     private void btnRegisterActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnRegisterActionPerformed
-         String email = txtEmail.getText();
-    String pwd = txtPassword.getText();
-    String role = cmbRole.getSelectedItem().toString();
-    String sector = cmbSector.getSelectedItem().toString();
+        
+        String email = txtEmail.getText().trim();
+        String password = txtPassword.getText();
+        String sector = cmbSector.getSelectedItem().toString().trim();
 
-    if (email.isEmpty() || pwd.isEmpty()) {
-        JOptionPane.showMessageDialog(this, "Please fill in all fields.");
-        return;
-    }
+        if (email.isEmpty() || password.isEmpty() || sector.isEmpty()) {
+            JOptionPane.showMessageDialog(this,
+                    "Please fill in all fields.");
+            return;
+        }
 
-    // POLYMORPHISM: Creating a Details object but treating it as a Person object
-    Person newUser = new Details(email, pwd, role, sector);
-    
-    // Retrieve the hashed password from the child class
-    String hashedPwd = ((Details) newUser).hashPassword();
+        // The backend expects the field "hashedPassword"
+        // but hashes the password itself.
+        String json = "{\"email\":" + jsonString(email)
+                + ",\"hashedPassword\":" + jsonString(password)
+                + ",\"role\":\"User\""
+                + ",\"sector\":" + jsonString(sector) + "}";
 
-    JOptionPane.showMessageDialog(this, 
-        "Account Created!\nRole: " + newUser.getRole() + 
-        "\nHashed Password: " + hashedPwd); // Shows your hashing works
+        btnRegister.setEnabled(false);
 
-    // Go back to Home Page
-    new HomeForm().setVisible(true);
-    this.dispose();
+        new SwingWorker<Integer, Void>() {
+
+            @Override
+            protected Integer doInBackground() throws Exception {
+                ApiClient api = new ApiClient();
+                HttpResponse<String> response =
+                        api.postJson("/api/user-signup", json);
+
+                return response.statusCode();
+            }
+
+            @Override
+            protected void done() {
+                btnRegister.setEnabled(true);
+
+                try {
+                    int status = get();
+
+                    if (status == 201) {
+                        JOptionPane.showMessageDialog(SignUpForm.this,
+                                "Account created successfully!");
+
+                        new HomeForm().setVisible(true);
+                        SignUpForm.this.dispose();
+
+                    } else if (status == 409) {
+                        JOptionPane.showMessageDialog(SignUpForm.this,
+                                "Email already registered.");
+                    } else {
+                        JOptionPane.showMessageDialog(SignUpForm.this,
+                                "Server returned: " + status);
+                    }
+
+                } catch (Exception ex) {
+                    JOptionPane.showMessageDialog(SignUpForm.this,
+                            "Connection failed: " + ex.getMessage());
+                }
+            }
+        }.execute();
     }//GEN-LAST:event_btnRegisterActionPerformed
 
     private void cmbRoleActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cmbRoleActionPerformed

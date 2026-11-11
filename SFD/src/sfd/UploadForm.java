@@ -4,15 +4,37 @@
  */
 package sfd;
 
+import java.io.File;
+
 /**
  *
  * @author HP
  */
 import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
+import sfd.crypto.AesCipherService;
+import sfd.crypto.AesKeyGeneratorService;
+import javax.crypto.SecretKey;
+import javax.swing.SwingWorker;
+import java.nio.file.Files;
+import java.util.Arrays;
+import sfd.crypto.RsaManagement;
+import java.security.KeyPair;
+import java.security.KeyPairGenerator;
+import java.util.Base64;
+
 public class UploadForm extends javax.swing.JFrame {
     
     private static final java.util.logging.Logger logger = java.util.logging.Logger.getLogger(UploadForm.class.getName());
+    private File selectedFile;
+    private int userId;
+    private int folderId;
+
+    public UploadForm(int userId, int folderId) {
+        this();
+        this.userId = userId;
+        this.folderId = folderId;
+    }
 
     /**
      * Creates new form UploadForm
@@ -78,21 +100,106 @@ public class UploadForm extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void btnSelectFileActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSelectFileActionPerformed
+        
         JFileChooser chooser = new JFileChooser();
-    int result = chooser.showOpenDialog(this);
-    if (result == JFileChooser.APPROVE_OPTION) {
-        txtFileName.setText(chooser.getSelectedFile().getName());
-    }
+
+        int result = chooser.showOpenDialog(this);
+
+        if (result == JFileChooser.APPROVE_OPTION) {
+            selectedFile = chooser.getSelectedFile();
+            txtFileName.setText(selectedFile.getName());
+        }
     }//GEN-LAST:event_btnSelectFileActionPerformed
 
     private void btnUploadActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnUploadActionPerformed
-         if (txtFileName.getText().isEmpty()) {
-        JOptionPane.showMessageDialog(this, "Please select a file first.");
-        return;
-    }
-    JOptionPane.showMessageDialog(this, "Uploading: " + txtFileName.getText());
-    new FileSelectorForm().setVisible(true); // Go back
-    this.dispose();
+         
+        if (selectedFile == null) {
+            JOptionPane.showMessageDialog(this,
+                    "Please select a file first.");
+            return;
+        }
+
+        btnUpload.setEnabled(false);
+
+        new SwingWorker<Boolean, Void>() {
+
+            @Override
+            protected Boolean doInBackground() throws Exception {
+
+                // Generate AES-256 key
+                AesKeyGeneratorService keyGenerator =
+                        new AesKeyGeneratorService();
+
+                SecretKey aesKey = keyGenerator.aesKeyGenerator();
+
+                // Encrypt selected file
+                AesCipherService cipher = new AesCipherService();
+
+                byte[] encryptedFile =
+                        cipher.encryptFileWithAesKey(selectedFile, aesKey);
+                
+                // Generate a temporary RSA key pair for testing
+               KeyPairGenerator rsaGenerator =
+                       KeyPairGenerator.getInstance("RSA");
+
+               rsaGenerator.initialize(2048);
+               KeyPair keyPair = rsaGenerator.generateKeyPair();
+
+               String publicKey = Base64.getEncoder()
+                       .encodeToString(keyPair.getPublic().getEncoded());
+
+               String privateKey = Base64.getEncoder()
+                       .encodeToString(keyPair.getPrivate().getEncoded());
+
+               // Encrypt the AES key using RSA
+               RsaManagement rsa = new RsaManagement();
+
+               String encryptedAesKey =
+                       rsa.encryptAesKeyWithRsaPublicKey(aesKey, publicKey);
+
+               if (encryptedAesKey == null) {
+                   return false;
+               }
+
+               // Decrypt the AES key using RSA
+               SecretKey decryptedAesKey =
+                       rsa.dencryptAesKeyWithRsaPrivateKey(
+                               encryptedAesKey, privateKey);
+
+               if (decryptedAesKey == null) {
+                   return false;
+               }
+
+               // Decrypt the file using the recovered AES key
+               byte[] decryptedFile =
+                       cipher.decryptFileWithAesKey(
+                               encryptedFile, decryptedAesKey);
+
+                byte[] originalFile =
+                        Files.readAllBytes(selectedFile.toPath());
+
+                return Arrays.equals(originalFile, decryptedFile);
+            }
+
+            @Override
+            protected void done() {
+                btnUpload.setEnabled(true);
+
+                try {
+                    if (get()) {
+                        JOptionPane.showMessageDialog(UploadForm.this,
+                                "Encryption and decryption successful!");
+                    } else {
+                        JOptionPane.showMessageDialog(UploadForm.this,
+                                "Decryption verification failed.");
+                    }
+                } catch (Exception ex) {
+                    JOptionPane.showMessageDialog(UploadForm.this,
+                            "Encryption failed: " + ex.getMessage());
+                }
+            }
+        }.execute();
+
     }//GEN-LAST:event_btnUploadActionPerformed
 
     /**
