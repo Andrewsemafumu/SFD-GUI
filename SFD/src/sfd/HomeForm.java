@@ -182,6 +182,8 @@ public class HomeForm extends javax.swing.JFrame {
                         
                         new FileSelectorForm(userId).setVisible(true);
                         HomeForm.this.dispose();
+                        
+                        
                     } else {
                         JOptionPane.showMessageDialog(HomeForm.this,
                                 "Could not retrieve User ID.");

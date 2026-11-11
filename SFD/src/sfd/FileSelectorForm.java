@@ -24,6 +24,15 @@ public class FileSelectorForm extends javax.swing.JFrame {
      */
     public FileSelectorForm() {
         initComponents();
+        
+        addWindowListener(new java.awt.event.WindowAdapter() {
+            @Override
+            public void windowOpened(java.awt.event.WindowEvent e) {
+                txtID.setText("1");
+                rbOpen.setSelected(true);
+                btnEnter.doClick();
+            }
+        });
     }
         
     private int userId;
