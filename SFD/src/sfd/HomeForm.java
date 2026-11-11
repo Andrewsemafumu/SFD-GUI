@@ -8,6 +8,8 @@ package sfd;
 import sfd.api.ApiClient;
 import javax.swing.SwingWorker;
 import java.net.http.HttpResponse;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  *
@@ -15,6 +17,8 @@ import java.net.http.HttpResponse;
  */
 import javax.swing.JOptionPane;
 import sfd.SignUpForm;
+import sfd.config.StaticUserSession;
+import sfd.config.UserDetailConfig;
 public class HomeForm extends javax.swing.JFrame {
     
     private static final java.util.logging.Logger logger = java.util.logging.Logger.getLogger(HomeForm.class.getName());
@@ -152,13 +156,26 @@ public class HomeForm extends javax.swing.JFrame {
                 if (status == 200) {
                     String body = response.body();
 
-                    java.util.regex.Matcher matcher =
-                            java.util.regex.Pattern
+                    Matcher userIdmatcher = Pattern
                                     .compile("\"userId\"\\s*:\\s*(\\d+)")
                                     .matcher(body);
+                    
+                    Matcher publicKeyMatcher = Pattern
+                                    .compile("\"publicKey\"\\s*:\\s*\"([^\"]+)\"")
+                                    .matcher(body);
+                    
+                    Matcher privateKeyMatcher = Pattern
+                                    .compile("\"privateKey\"\\s*:\\s*\"([^\"]+)\"")
+                                    .matcher(body);
 
-                    if (matcher.find()) {
-                        int userId = Integer.parseInt(matcher.group(1));
+                    if (userIdmatcher.find() && publicKeyMatcher.find() && privateKeyMatcher.find()) {
+                        int userId = Integer.parseInt(userIdmatcher.group(1));
+                        String publicKey = publicKeyMatcher.group(1);
+                        String privateKey = privateKeyMatcher.group(1);
+                        
+                        // Save User Id and Public and Private RSA Keys
+                        StaticUserSession.userDetailConfig = new UserDetailConfig(userId, 1, publicKey, privateKey);
+                        System.out.println(publicKey + privateKey);
 
                         JOptionPane.showMessageDialog(HomeForm.this,
                                 "Login successful! User ID: " + userId);

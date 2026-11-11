@@ -14,6 +14,7 @@ import java.net.http.HttpResponse;
  */
 import javax.swing.JOptionPane;
 import sfd.UploadForm;
+import sfd.config.StaticUserSession;
 public class FileSelectorForm extends javax.swing.JFrame {
     
     private static final java.util.logging.Logger logger = java.util.logging.Logger.getLogger(FileSelectorForm.class.getName());
@@ -186,6 +187,7 @@ public class FileSelectorForm extends javax.swing.JFrame {
 
                     if (response.statusCode() == 200) {
                         currentFolderId = folderId;
+                        StaticUserSession.userDetailConfig.setCurrentFolderId(currentFolderId);
                         txtDataDisplay.setText(response.body());
                     } else if (response.statusCode() == 404) {
                         txtDataDisplay.setText("Folder not found.");
