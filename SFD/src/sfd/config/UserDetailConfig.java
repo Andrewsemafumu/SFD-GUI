@@ -14,10 +14,10 @@ import java.security.PublicKey;
 public final class UserDetailConfig {
     private int userId;
     private int currentFolderId;
-    private PublicKey publicKey;
-    private PrivateKey privateKey;
+    private String publicKey;
+    private String privateKey;
 
-    public UserDetailConfig(int userId, int currentFolderId, PublicKey publicKey, PrivateKey privateKey) {
+    public UserDetailConfig(int userId, int currentFolderId, String publicKey, String privateKey) {
         this.userId = userId;
         this.currentFolderId = currentFolderId;
         this.publicKey = publicKey;
@@ -32,11 +32,11 @@ public final class UserDetailConfig {
         return currentFolderId;
     }
     
-    public PublicKey getPublicKey() {
+    public String getPublicKey() {
         return publicKey;
     }
     
-    public PrivateKey getPrivateKey() {
+    public String getPrivateKey() {
         return privateKey;
     }
 
@@ -48,11 +48,11 @@ public final class UserDetailConfig {
         this.currentFolderId = currentFolderId;
     }
     
-    public void setPublicKey(PublicKey publicKey) {
+    public void setPublicKey(String publicKey) {
         this.publicKey = publicKey;
     }
     
-    public void setPrivateKey(PrivateKey privateKey){
+    public void setPrivateKey(String privateKey){
         this.privateKey = privateKey;
     }
     
