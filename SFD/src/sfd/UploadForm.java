@@ -22,6 +22,13 @@ import sfd.crypto.RsaManagement;
 import java.security.KeyPair;
 import java.security.KeyPairGenerator;
 import java.util.Base64;
+import java.io.ByteArrayOutputStream;
+import java.nio.charset.StandardCharsets;
+import java.util.UUID;
+import sfd.api.ApiClient;
+import sfd.config.StaticUserSession;
+import java.net.http.HttpResponse;
+import java.io.IOException;
 
 public class UploadForm extends javax.swing.JFrame {
     
@@ -139,17 +146,8 @@ public class UploadForm extends javax.swing.JFrame {
                         cipher.encryptFileWithAesKey(selectedFile, aesKey);
                 
                 // Generate a temporary RSA key pair for testing
-               KeyPairGenerator rsaGenerator =
-                       KeyPairGenerator.getInstance("RSA");
-
-               rsaGenerator.initialize(2048);
-               KeyPair keyPair = rsaGenerator.generateKeyPair();
-
-               String publicKey = Base64.getEncoder()
-                       .encodeToString(keyPair.getPublic().getEncoded());
-
-               String privateKey = Base64.getEncoder()
-                       .encodeToString(keyPair.getPrivate().getEncoded());
+               String publicKey = StaticUserSession.userDetailConfig.getPublicKey();
+               String privateKey = StaticUserSession.userDetailConfig.getPrivateKey();
 
                // Encrypt the AES key using RSA
                RsaManagement rsa = new RsaManagement();
@@ -178,7 +176,29 @@ public class UploadForm extends javax.swing.JFrame {
                 byte[] originalFile =
                         Files.readAllBytes(selectedFile.toPath());
 
-                return Arrays.equals(originalFile, decryptedFile);
+                if (!Arrays.equals(originalFile, decryptedFile)) {
+                    return false;
+                }
+                
+                System.out.println("User ID: " + userId);
+                System.out.println("Folder ID: " + folderId);
+                System.out.println("Encrypted file size: " + encryptedFile.length);
+
+                ApiClient api = new ApiClient();
+
+                HttpResponse<String> response = api.uploadEncryptedFile(
+                        selectedFile,
+                        encryptedFile,
+                        userId,
+                        folderId,
+                        encryptedAesKey
+                );
+
+                if (response.statusCode() < 200 || response.statusCode() >= 300) {
+                    throw new IOException("Upload failed: " + response.statusCode()
+                            + " - " + response.body());
+                }
+                return true;
             }
 
             @Override
@@ -188,14 +208,14 @@ public class UploadForm extends javax.swing.JFrame {
                 try {
                     if (get()) {
                         JOptionPane.showMessageDialog(UploadForm.this,
-                                "Encryption and decryption successful!");
+                                "Encryption and upload successful!");
                     } else {
                         JOptionPane.showMessageDialog(UploadForm.this,
                                 "Decryption verification failed.");
                     }
                 } catch (Exception ex) {
                     JOptionPane.showMessageDialog(UploadForm.this,
-                            "Encryption failed: " + ex.getMessage());
+                            "Upload failed: " + ex.getMessage());
                 }
             }
         }.execute();
