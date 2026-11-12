@@ -4,6 +4,7 @@
  */
 package sfd.api;
 
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import sfd.config.ServerConnectionConfig;
 import java.io.IOException;
@@ -11,7 +12,10 @@ import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
+import java.nio.charset.StandardCharsets;
 import java.time.Duration;
+import java.util.UUID;
+import sfd.dto.FileUploadDto;
 
 /**
  *
@@ -66,32 +70,48 @@ public class ApiClient {
         
         
         public HttpResponse<String> uploadEncryptedFile(
-                File file, byte[] encryptedBytes,
-                int ownerId, int folderId, String encryptedAesKey)
+                byte[] encryptedBytes,
+                FileUploadDto fileUploadDto)
                 throws IOException, InterruptedException {
+            
+            String boundary = "----Boundary" + UUID.randomUUID();
+            String CRLF = "\r\n";
+            
+            ByteArrayOutputStream out = new ByteArrayOutputStream();
+            
+            // Fields bound by @ModelAttribute
+            writeField(out, boundary, "ownerId", String.valueOf(fileUploadDto.getOwnerId()));
+            writeField(out, boundary, "folderId", String.valueOf(fileUploadDto.getFolderId()));
+            writeField(out, boundary, "encryptedAesKey", fileUploadDto.getEncryptedAesKey());
+            
+            // File part bound by @RequestParam("file")
+            out.write(("--" + boundary + CRLF).getBytes(StandardCharsets.UTF_8));
+            out.write(("Content-Disposition: form-data; name=\"file\"; filename=\"" + fileUploadDto.getFileName() + "\"" + CRLF).getBytes(StandardCharsets.UTF_8));
+            out.write(("Content-Type: application/octet-stream" + CRLF + CRLF).getBytes(StandardCharsets.UTF_8));
+            out.write(encryptedBytes);
+            out.write(CRLF.getBytes(StandardCharsets.UTF_8));
+            
+            // Closing boundardy
+            out.write(("--" + boundary + "--" + CRLF).getBytes(StandardCharsets.UTF_8));
 
-            String boundary = "SFD" + System.currentTimeMillis();
-
-            String data =
-                    "--" + boundary + "\r\nContent-Disposition: form-data; name=\"ownerId\"\r\n\r\n" + ownerId + "\r\n" +
-                    "--" + boundary + "\r\nContent-Disposition: form-data; name=\"folderId\"\r\n\r\n" + folderId + "\r\n" +
-                    "--" + boundary + "\r\nContent-Disposition: form-data; name=\"encryptedAesKey\"\r\n\r\n" + encryptedAesKey + "\r\n" +
-                    "--" + boundary + "\r\nContent-Disposition: form-data; name=\"file\"; filename=\"" + file.getName().replace("\"", "_").replace("\r", "_").replace("\n", "_") + "\"\r\n" +
-                    "Content-Type: application/octet-stream\r\n\r\n";
-
-            HttpRequest.BodyPublisher body = HttpRequest.BodyPublishers.concat(
-                    HttpRequest.BodyPublishers.ofString(data),
-                    HttpRequest.BodyPublishers.ofByteArray(encryptedBytes),
-                    HttpRequest.BodyPublishers.ofString("\r\n--" + boundary + "--\r\n")
-            );
+            
 
             HttpRequest request = HttpRequest.newBuilder()
-                    .uri(URI.create(baseUrl + "/api/file/upload"))
-                    .header("Content-Type", "multipart/form-data; boundary=" + boundary)
-                    .POST(body)
-                    .build();
+            .uri(URI.create(baseUrl + "/api/file/upload"))
+            .header("Content-Type", "multipart/form-data; boundary=" + boundary)
+            .POST(HttpRequest.BodyPublishers.ofByteArray(out.toByteArray()))
+            .build();
 
             return client.send(request, HttpResponse.BodyHandlers.ofString());
+        }
+        
+        private void writeField(ByteArrayOutputStream out, String boundary, String name, String value) throws IOException {
+            String CRLF = "\r\n";
+            out.write(("--" + boundary + CRLF).getBytes(StandardCharsets.UTF_8));
+            out.write(("Content-Disposition: form-data; name=\"" + name + "\"" + CRLF + CRLF)
+                    .getBytes(StandardCharsets.UTF_8));
+            out.write(value.getBytes(StandardCharsets.UTF_8));
+            out.write(CRLF.getBytes(StandardCharsets.UTF_8));
         }
         
     

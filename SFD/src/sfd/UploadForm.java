@@ -29,6 +29,7 @@ import sfd.api.ApiClient;
 import sfd.config.StaticUserSession;
 import java.net.http.HttpResponse;
 import java.io.IOException;
+import sfd.dto.FileUploadDto;
 
 public class UploadForm extends javax.swing.JFrame {
     
@@ -119,7 +120,7 @@ public class UploadForm extends javax.swing.JFrame {
     }//GEN-LAST:event_btnSelectFileActionPerformed
 
     private void btnUploadActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnUploadActionPerformed
-         
+         // Check if user selected a file
         if (selectedFile == null) {
             JOptionPane.showMessageDialog(this,
                     "Please select a file first.");
@@ -145,9 +146,8 @@ public class UploadForm extends javax.swing.JFrame {
                 byte[] encryptedFile =
                         cipher.encryptFileWithAesKey(selectedFile, aesKey);
                 
-                // Generate a temporary RSA key pair for testing
-               String publicKey = StaticUserSession.userDetailConfig.getPublicKey();
-               String privateKey = StaticUserSession.userDetailConfig.getPrivateKey();
+                // Get user's public RSA Key
+               String publicKey = StaticUserSession.userDetailConfig.getPublicKey();;
 
                // Encrypt the AES key using RSA
                RsaManagement rsa = new RsaManagement();
@@ -159,39 +159,23 @@ public class UploadForm extends javax.swing.JFrame {
                    return false;
                }
 
-               // Decrypt the AES key using RSA
-               SecretKey decryptedAesKey =
-                       rsa.dencryptAesKeyWithRsaPrivateKey(
-                               encryptedAesKey, privateKey);
-
-               if (decryptedAesKey == null) {
-                   return false;
-               }
-
-               // Decrypt the file using the recovered AES key
-               byte[] decryptedFile =
-                       cipher.decryptFileWithAesKey(
-                               encryptedFile, decryptedAesKey);
-
-                byte[] originalFile =
-                        Files.readAllBytes(selectedFile.toPath());
-
-                if (!Arrays.equals(originalFile, decryptedFile)) {
-                    return false;
-                }
                 
                 System.out.println("User ID: " + userId);
                 System.out.println("Folder ID: " + folderId);
                 System.out.println("Encrypted file size: " + encryptedFile.length);
+                
+                // File Upload Dto
+                FileUploadDto fileUploadDto = new FileUploadDto();
+                fileUploadDto.setOwnerId(userId);
+                fileUploadDto.setFolderId(folderId);
+                fileUploadDto.setFileName(selectedFile.getName());
+                fileUploadDto.setEncryptedAesKey(encryptedAesKey);
 
                 ApiClient api = new ApiClient();
 
                 HttpResponse<String> response = api.uploadEncryptedFile(
-                        selectedFile,
                         encryptedFile,
-                        userId,
-                        folderId,
-                        encryptedAesKey
+                        fileUploadDto
                 );
 
                 if (response.statusCode() < 200 || response.statusCode() >= 300) {
