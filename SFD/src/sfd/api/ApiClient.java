@@ -93,6 +93,15 @@ public class ApiClient {
 
             return client.send(request, HttpResponse.BodyHandlers.ofString());
         }
+        
+    
+        public HttpResponse<String> downloadEncryptedFile(
+                int userId, int fileId)
+                throws IOException, InterruptedException {
 
+            String json = "{\"userId\":" + userId
+                    + ",\"fileId\":" + fileId + "}";
 
+            return postJson("/api/file/download", json);
+        }
 }

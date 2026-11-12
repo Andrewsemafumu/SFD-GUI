@@ -4,20 +4,33 @@
  */
 package sfd;
 
+
+import javax.swing.JFileChooser;
+import java.io.File;
+import java.nio.file.Files;
 import sfd.api.ApiClient;
 import javax.swing.SwingWorker;
 import java.net.http.HttpResponse;
+import java.util.Base64;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+import javax.crypto.SecretKey;
+import sfd.crypto.RsaManagement;
+import sfd.crypto.AesCipherService;
 
 /**
  *
  * @author HP
  */
 import javax.swing.JOptionPane;
-import sfd.UploadForm;
 import sfd.config.StaticUserSession;
 public class FileSelectorForm extends javax.swing.JFrame {
     
     private static final java.util.logging.Logger logger = java.util.logging.Logger.getLogger(FileSelectorForm.class.getName());
+    private byte[] downloadedEncryptedFile;
+    private String downloadedEncryptedAesKey;
+    private SecretKey downloadedAesKey;
+    private byte[] downloadedDecryptedFile;
 
     /**
      * Creates new form FileSelectorForm
@@ -42,7 +55,128 @@ public class FileSelectorForm extends javax.swing.JFrame {
         this();
         this.userId = userId;
     }
+    
+    
+    
+    private void downloadFile(int fileId) {
 
+        btnEnter.setEnabled(false);
+        txtDataDisplay.setText("Downloading encrypted file...");
+
+        new SwingWorker<HttpResponse<String>, Void>() {
+
+            @Override
+            protected HttpResponse<String> doInBackground()
+                    throws Exception {
+
+                ApiClient api = new ApiClient();
+
+                return api.downloadEncryptedFile(userId, fileId);
+            }
+
+            @Override
+            protected void done() {
+                btnEnter.setEnabled(true);
+
+                try {
+                    HttpResponse<String> response = get();
+
+                    
+                    if (response.statusCode() == 200) {
+
+                    String json = response.body();
+
+                    Matcher keyMatcher = Pattern.compile(
+                            "\"encryptedAesKey\"\\s*:\\s*\"([^\"]+)\"")
+                            .matcher(json);
+
+                    Matcher fileMatcher = Pattern.compile(
+                            "\"encryptedFile\"\\s*:\\s*\"([^\"]+)\"")
+                            .matcher(json);
+
+                    if (!keyMatcher.find() || !fileMatcher.find()) {
+                        throw new IllegalArgumentException(
+                                "Invalid download response.");
+                    }
+
+                    downloadedEncryptedAesKey = keyMatcher.group(1);
+
+                    downloadedEncryptedFile = Base64.getDecoder()
+                            .decode(fileMatcher.group(1));
+                                       
+                    String privateKey =
+                            StaticUserSession.userDetailConfig.getPrivateKey();
+
+                    RsaManagement rsa = new RsaManagement();
+
+                    downloadedAesKey =
+                            rsa.dencryptAesKeyWithRsaPrivateKey(
+                                    downloadedEncryptedAesKey,
+                                    privateKey);
+
+                    if (downloadedAesKey == null) {
+                        throw new IllegalStateException(
+                                "Failed to decrypt AES key.");
+                    }
+                    
+                    AesCipherService aes = new AesCipherService();
+
+                    downloadedDecryptedFile = aes.decryptFileWithAesKey(downloadedEncryptedFile,downloadedAesKey);
+                    
+                    Matcher nameMatcher = Pattern.compile(
+                            "\"fileName\"\\s*:\\s*\"([^\"]+)\"")
+                            .matcher(json);
+
+                    String fileName = nameMatcher.find()
+                            ? new File(nameMatcher.group(1)).getName()
+                            : "downloaded_" + fileId;
+
+                    JFileChooser chooser = new JFileChooser();
+                    chooser.setDialogTitle("Save Decrypted File");
+                    chooser.setSelectedFile(new File(fileName));
+
+                    int result = chooser.showSaveDialog(
+                            FileSelectorForm.this);
+
+                    if (result == JFileChooser.APPROVE_OPTION) {
+
+                        File selectedFile = chooser.getSelectedFile();
+
+                        if (selectedFile.exists()) {
+                            int confirm = JOptionPane.showConfirmDialog(
+                                    FileSelectorForm.this,
+                                    "File already exists. Overwrite it?",
+                                    "Confirm Overwrite",
+                                    JOptionPane.YES_NO_OPTION);
+
+                            if (confirm != JOptionPane.YES_OPTION) {
+                                return;
+                            }
+                        }
+
+                        Files.write(
+                                selectedFile.toPath(),
+                                downloadedDecryptedFile);
+
+                        txtDataDisplay.setText(
+                                "File downloaded and decrypted successfully! "
+                                + "Saved to: "
+                                + selectedFile.getAbsolutePath());
+                    }
+                    } else{
+                            txtDataDisplay.setText(
+                                    "Download failed: "+ response.statusCode()+ "\n" + response.body());
+                    }
+
+                } catch (Exception ex) {
+                    JOptionPane.showMessageDialog(
+                            FileSelectorForm.this,
+                            "Download error: " + ex.getMessage());
+                }
+            }
+
+        }.execute();
+    }
 
     /**
      * This method is called from within the constructor to initialize the form.
@@ -151,6 +285,25 @@ public class FileSelectorForm extends javax.swing.JFrame {
 
     private void btnEnterActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnEnterActionPerformed
     
+        
+        if (rbDownload.isSelected()) {
+            int fileId;
+
+            try {
+                fileId = Integer.parseInt(txtID.getText().trim());
+
+                if (fileId <= 0) {
+                    throw new NumberFormatException();
+                }
+            } catch (NumberFormatException ex) {
+                JOptionPane.showMessageDialog(this,
+                        "Please enter a valid File ID.");
+                return;
+            }
+
+            downloadFile(fileId);
+            return;
+        }
         if (!rbOpen.isSelected()) {
             JOptionPane.showMessageDialog(this,
                     "Please select Open Folder.");
