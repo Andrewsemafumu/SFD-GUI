@@ -21,13 +21,14 @@ import java.util.regex.Pattern;
 import javax.crypto.SecretKey;
 import sfd.crypto.RsaManagement;
 import sfd.crypto.AesCipherService;
+import javax.swing.JOptionPane;
+import sfd.config.StaticUserSession;
 
 /**
  *
  * @author HP
  */
-import javax.swing.JOptionPane;
-import sfd.config.StaticUserSession;
+
 public class FileSelectorForm extends javax.swing.JFrame {
     
     private static final java.util.logging.Logger logger = java.util.logging.Logger.getLogger(FileSelectorForm.class.getName());
@@ -41,13 +42,12 @@ public class FileSelectorForm extends javax.swing.JFrame {
      */
     public FileSelectorForm() {
         initComponents();
+        txtDataDisplay.setLineWrap(true);
+        txtDataDisplay.setWrapStyleWord(true);
         
         addWindowListener(new java.awt.event.WindowAdapter() {
             @Override
-            public void windowOpened(java.awt.event.WindowEvent e) {
-                txtID.setText("1");
-                rbOpen.setSelected(true);
-                btnEnter.doClick();
+            public void windowOpened(java.awt.event.WindowEvent e) {txtID.setText("1"); rbOpen.setSelected(true);btnEnter.doClick();
             }
         });
     }
@@ -70,8 +70,7 @@ public class FileSelectorForm extends javax.swing.JFrame {
         new SwingWorker<HttpResponse<String>, Void>() {
 
             @Override
-            protected HttpResponse<String> doInBackground()
-                    throws Exception {
+            protected HttpResponse<String> doInBackground() throws Exception {
 
                 ApiClient api = new ApiClient();
 
@@ -82,58 +81,46 @@ public class FileSelectorForm extends javax.swing.JFrame {
             protected void done() {
                 btnEnter.setEnabled(true);
 
-                try {
-                    HttpResponse<String> response = get();
+                try {HttpResponse<String> response = get();
 
-                    
                     if (response.statusCode() == 200) {
 
                     String json = response.body();
 
-                    Matcher keyMatcher = Pattern.compile(
-                            "\"encryptedAesKey\"\\s*:\\s*\"([^\"]+)\"")
-                            .matcher(json);
+                    Matcher keyMatcher = Pattern.compile("\"encryptedAesKey\"\\s*:\\s*\"([^\"]+)\"").matcher(json);
 
-                    Matcher fileMatcher = Pattern.compile(
-                            "\"encryptedFile\"\\s*:\\s*\"([^\"]+)\"")
-                            .matcher(json);
+                    Matcher fileMatcher = Pattern.compile("\"encryptedFile\"\\s*:\\s*\"([^\"]+)\"").matcher(json);
 
                     if (!keyMatcher.find() || !fileMatcher.find()) {
-                        throw new IllegalArgumentException(
-                                "Invalid download response.");
+                        throw new IllegalArgumentException("Invalid download response.");
                     }
 
                     downloadedEncryptedAesKey = keyMatcher.group(1);
 
-                    downloadedEncryptedFile = Base64.getDecoder()
-                            .decode(fileMatcher.group(1));
+                    downloadedEncryptedFile = Base64.getDecoder().decode(fileMatcher.group(1));
                                        
-                    String privateKey =
-                            StaticUserSession.userDetailConfig.getPrivateKey();
+                    String privateKey =StaticUserSession.userDetailConfig.getPrivateKey();
 
                     RsaManagement rsa = new RsaManagement();
 
-                    downloadedAesKey =
-                            rsa.dencryptAesKeyWithRsaPrivateKey(
-                                    downloadedEncryptedAesKey,
-                                    privateKey);
+                    downloadedAesKey =rsa.dencryptAesKeyWithRsaPrivateKey(downloadedEncryptedAesKey,privateKey);
 
                     if (downloadedAesKey == null) {
-                        throw new IllegalStateException(
-                                "Failed to decrypt AES key.");
+                        throw new IllegalStateException("Failed to decrypt AES key.");
                     }
                     
                     AesCipherService aes = new AesCipherService();
 
                     downloadedDecryptedFile = aes.decryptFileWithAesKey(downloadedEncryptedFile,downloadedAesKey);
                     
-                    Matcher nameMatcher = Pattern.compile(
-                            "\"fileName\"\\s*:\\s*\"([^\"]+)\"")
-                            .matcher(json);
+                    Matcher nameMatcher = Pattern.compile("\"fileName\"\\s*:\\s*\"([^\"]+)\"").matcher(json);
 
-                    String fileName = nameMatcher.find()
-                            ? new File(nameMatcher.group(1)).getName()
-                            : "downloaded_" + fileId;
+                    String fileName;
+                    if (nameMatcher.find()) {
+                        fileName =new File(nameMatcher.group(1)).getName();
+                    } else {
+                        fileName= "downloaded_" + fileId;
+                    }
 
                     JFileChooser chooser = new JFileChooser();
                     chooser.setDialogTitle("Save Decrypted File");
