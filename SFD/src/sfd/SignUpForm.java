@@ -4,6 +4,7 @@
  */
 package sfd;
 
+import javax.swing.JOptionPane;
 import sfd.api.ApiClient;
 import javax.swing.SwingWorker;
 import java.net.http.HttpResponse;
@@ -12,7 +13,7 @@ import java.net.http.HttpResponse;
  *
  * @author HP
  */
-import javax.swing.JOptionPane;
+
 public class SignUpForm extends javax.swing.JFrame {
     
     private static final java.util.logging.Logger logger = java.util.logging.Logger.getLogger(SignUpForm.class.getName());

@@ -10,15 +10,15 @@ import javax.swing.SwingWorker;
 import java.net.http.HttpResponse;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import javax.swing.JOptionPane;
+import sfd.config.StaticUserSession;
+import sfd.config.UserDetailConfig;
 
 /**
  *
  * @author HP
  */
-import javax.swing.JOptionPane;
-import sfd.SignUpForm;
-import sfd.config.StaticUserSession;
-import sfd.config.UserDetailConfig;
+
 public class HomeForm extends javax.swing.JFrame {
     
     private static final java.util.logging.Logger logger = java.util.logging.Logger.getLogger(HomeForm.class.getName());

@@ -5,31 +5,24 @@
 package sfd;
 
 import java.io.File;
-
-/**
- *
- * @author HP
- */
 import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
 import sfd.crypto.AesCipherService;
 import sfd.crypto.AesKeyGeneratorService;
 import javax.crypto.SecretKey;
 import javax.swing.SwingWorker;
-import java.nio.file.Files;
-import java.util.Arrays;
 import sfd.crypto.RsaManagement;
-import java.security.KeyPair;
-import java.security.KeyPairGenerator;
-import java.util.Base64;
-import java.io.ByteArrayOutputStream;
-import java.nio.charset.StandardCharsets;
-import java.util.UUID;
 import sfd.api.ApiClient;
 import sfd.config.StaticUserSession;
 import java.net.http.HttpResponse;
 import java.io.IOException;
 import sfd.dto.FileUploadDto;
+
+
+/**
+ *
+ * @author HP
+ */
 
 public class UploadForm extends javax.swing.JFrame {
     

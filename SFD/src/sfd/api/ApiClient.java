@@ -5,7 +5,6 @@
 package sfd.api;
 
 import java.io.ByteArrayOutputStream;
-import java.io.File;
 import sfd.config.ServerConnectionConfig;
 import java.io.IOException;
 import java.net.URI;
@@ -33,8 +32,7 @@ public class ApiClient {
             .connectTimeout(Duration.ofSeconds(10))
             .build();
 
-    public HttpResponse<String> postJson(
-            String endpoint, String json)
+    public HttpResponse<String> postJson(String endpoint, String json)
             throws IOException, InterruptedException {
 
         System.out.println("API URL: " + baseUrl + endpoint);
@@ -45,15 +43,11 @@ public class ApiClient {
                 .POST(HttpRequest.BodyPublishers.ofString(json))
                 .build();
 
-        return client.send(
-                request,
-                HttpResponse.BodyHandlers.ofString()
-        );
+        return client.send(request,HttpResponse.BodyHandlers.ofString());
     }
     
     
-        public HttpResponse<String> getJson(String endpoint)
-                throws IOException, InterruptedException {
+        public HttpResponse<String> getJson(String endpoint) throws IOException, InterruptedException {
 
             HttpRequest request = HttpRequest.newBuilder()
                     .uri(URI.create(baseUrl + endpoint))

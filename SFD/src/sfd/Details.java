@@ -4,16 +4,15 @@
  */
 package sfd;
 
-import sfd.Person;
 
 /**
  *
  * @author HP
  */
 public class Details extends Person {
-    private String password;
-    private String role;
-    private String sector;
+    private final String password;
+    private final String role;
+    private final String sector;
 
     public Details(String email, String password, String role, String sector) {
         super(email); // Pass email to the parent class

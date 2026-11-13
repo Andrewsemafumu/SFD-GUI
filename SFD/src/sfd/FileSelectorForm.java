@@ -5,13 +5,17 @@
 package sfd;
 
 
+import java.awt.HeadlessException;
 import javax.swing.JFileChooser;
 import java.io.File;
+import java.io.IOException;
 import java.nio.file.Files;
 import sfd.api.ApiClient;
 import javax.swing.SwingWorker;
 import java.net.http.HttpResponse;
+import java.security.GeneralSecurityException;
 import java.util.Base64;
+import java.util.concurrent.ExecutionException;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import javax.crypto.SecretKey;
@@ -158,20 +162,14 @@ public class FileSelectorForm extends javax.swing.JFrame {
                                 selectedFile.toPath(),
                                 downloadedDecryptedFile);
 
-                        txtDataDisplay.setText(
-                                "File downloaded and decrypted successfully! "
-                                + "Saved to: "
-                                + selectedFile.getAbsolutePath());
+                        txtDataDisplay.setText("File downloaded and decrypted successfully! "+ "Saved to: "+ selectedFile.getAbsolutePath());
                     }
                     } else{
-                            txtDataDisplay.setText(
-                                    "Download failed: "+ response.statusCode()+ "\n" + response.body());
+                            txtDataDisplay.setText("Download failed: "+ response.statusCode()+ "\n" + response.body());
                     }
 
-                } catch (Exception ex) {
-                    JOptionPane.showMessageDialog(
-                            FileSelectorForm.this,
-                            "Download error: " + ex.getMessage());
+                } catch (HeadlessException | IOException | IllegalArgumentException | IllegalStateException | InterruptedException | GeneralSecurityException | ExecutionException ex) {
+                    JOptionPane.showMessageDialog(FileSelectorForm.this," Download error: " + ex.getMessage());
                 }
             }
 

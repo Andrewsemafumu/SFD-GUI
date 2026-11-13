@@ -9,7 +9,7 @@ package sfd.config;
  * @author afoud
  */
 public class ServerConnectionConfig {
-    private String serverUrl;
+    private final String serverUrl;
     
     public ServerConnectionConfig() {
         this.serverUrl = "http://54.78.153.242:8080";
